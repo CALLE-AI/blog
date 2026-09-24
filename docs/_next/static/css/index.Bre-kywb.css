@@ -4,3 +4,11 @@
 /* Official CALL-E wordmark and left-aligned blog introduction. */
 .brand-logo{display:block;width:134px;height:44px}.brand{letter-spacing:0}.blog-hero>p{margin-left:0;margin-right:0;max-width:670px;text-align:center}footer .brand-logo{filter:invert(1)}
 @media (max-width:520px){.brand-logo{width:116px;height:auto}}
+
+/* Equal card content widths keep all covers aligned at the same 3:2 size. */
+@media (min-width:901px){
+  .post-list{column-gap:68px}
+  .post-row,.post-row:not(:nth-child(3n+1)){min-width:0;padding-left:0;padding-right:0;border-left:0}
+  .post-row:not(:nth-child(3n+1))::before{content:"";position:absolute;left:-34px;top:0;bottom:0;border-left:1px solid var(--line)}
+}
+.post-image{flex-shrink:0}

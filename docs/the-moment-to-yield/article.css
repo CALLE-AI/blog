@@ -1,0 +1,61 @@
+@font-face {
+  font-family: Geist;
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-98bbbccb.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-013b2f2f.woff2") format("woff2");
+}
+
+body {
+  --font-geist-sans: Geist, Arial, sans-serif;
+  --font-geist-mono: "Geist Mono", monospace;
+}
+
+.scenario-quote {
+  margin: 24px 0 32px;
+  padding: 8px 0 8px 22px;
+  font: 20px/1.72 Georgia, serif;
+}
+
+.scenario-quote span {
+  display: block;
+  font: 11px/1.6 Geist, Arial, sans-serif;
+  letter-spacing: .12em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.figure-storyboard {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.architecture-figure > a:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 5px;
+  border-radius: 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reading-progress {
+    animation: none;
+    display: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}

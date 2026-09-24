@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <title>The Moment to Yield | CALL-E</title>
+    <meta content="How voice agents use speech evidence to decide when to yield." name="description"/>
+    <link href="https://blog.heycall-e.com/the-moment-to-yield/" rel="canonical"/>
+    <meta content="The Moment to Yield" property="og:title"/>
+    <meta content="How voice agents use speech evidence to decide when to yield." property="og:description"/>
+    <meta content="article" property="og:type"/>
+    <meta content="https://blog.heycall-e.com/the-moment-to-yield/" property="og:url"/>
+    <meta content="https://blog.heycall-e.com/og.png" property="og:image"/>
+    <meta content="summary_large_image" name="twitter:card"/>
+    <meta content="The Moment to Yield" name="twitter:title"/>
+    <meta content="How voice agents use speech evidence to decide when to yield." name="twitter:description"/>
+    <meta content="https://blog.heycall-e.com/og.png" name="twitter:image"/>
+    <link href="/_next/static/css/index.Bre-kywb.css?v=3" rel="stylesheet"/>
+    <link href="/the-moment-to-yield/article.css" rel="stylesheet"/>
+  </head>
+  <body class="antialiased">
+    <main>
+      <div aria-hidden="true" class="reading-progress">
+
+      </div>
+      <header class="site-header">
+        <a aria-label="CALL-E home" class="brand" href="https://www.heycall-e.com/"><img alt="CALL-E" class="brand-logo" src="/logo-call-e.svg?v=3"/></a>
+        <a class="blog-nav-current" href="/">Blog</a>
+        <a class="header-cta" href="https://www.heycall-e.com/">Explore CALL-E</a>
+      </header>
+      <article id="article">
+        <section class="hero" id="top">
+          <h1>The Moment<br/>to Yield.</h1>
+          <p class="dek">How voice agents use speech evidence to decide when to yield.</p>
+          <div class="byline">
+            <p>By Xiaoya Gan and Zhengxiang Zhu</p>
+          </div>
+        </section>
+        <section class="article-grid">
+          <div class="prose">
+            <section id="opening">
+              <p>Imagine calling to change an appointment. The voice agent has found your booking and begins to explain:</p>
+              <blockquote class="example-line scenario-quote"><span>AGENT</span>“Your appointment is on Thursday afternoon, and you’ll need to bring…”</blockquote>
+              <p>You say, “Yeah.” Should the agent stop?</p>
+              <p>If you are simply acknowledging the explanation, stopping would break the flow. But you might continue: <strong>“Yeah, but I need to change the date.”</strong> Now you are asking to redirect the call. Or you might open with the request itself: “I need to change the date.”</p>
+              <p>The challenge is that a request can share its opening with an acknowledgment. At the first word, the rest of the expression is still unknown. Keeping an observation open gives later words a chance to meet the interruption policy’s conditions before that observation ends.</p>
+              <figure class="architecture-figure figure-storyboard">
+                <a aria-label="Open scene storyboard diagram at full size" href="/yield-storyboard.svg" rel="noreferrer" target="_blank"><img alt="Three panels: Yeah may acknowledge the agent; Yeah but adds new evidence; I need to change the date requests the floor. A standalone Yeah can end without interruption." decoding="async" height="1000" loading="lazy" src="/yield-storyboard.svg" width="900"/></a>
+                <figcaption>An acknowledgment can lead into a request. While the observation remains open and no interruption has been issued, later text can be checked against the policy. This is a conceptual example, without exact trigger points or measured timing. <a aria-label="Open scene storyboard diagram at full size" href="/yield-storyboard.svg" rel="noreferrer" target="_blank">Open full-size diagram ↗</a></figcaption>
+              </figure>
+              <p>This is where observation windows become useful: they keep the developing expression together while the system decides whether to continue or yield. Streaming transcripts and turn-aware signals offer two ways to organize that evidence.</p>
+            </section>
+            <section id="the-architecture-of-an-interruption">
+              <h2>The architecture of an interruption</h2>
+              <p>Start with an observation window around the user’s expression. While the user’s speech overlaps the agent’s playback, associate incoming evidence with that window: speech activity, the developing transcript, and indications of whether the expression is continuing or ending.</p>
+              <p>The window provides continuity. A short acknowledgment may not meet the conditions for an interruption; later text can still be evaluated while that observation remains open and no interruption has been issued. Associating evidence with the current observation helps keep unrelated turns separate.</p>
+              <p>Observation and action have separate roles. An observation may close without an interruption. If the text and playback conditions are met, the policy can request an interruption before the user finishes speaking.</p>
+              <figure class="architecture-figure">
+                <a aria-label="Open interruption architecture diagram at full size" href="/yield-architecture.svg" rel="noreferrer" target="_blank"><img alt="Observe overlapping speech, associate evidence with the current expression, check policy conditions, then continue or request an interruption." decoding="async" height="270" loading="lazy" src="/yield-architecture.svg" width="960"/></a>
+                <figcaption>Figure 1. A conceptual architecture for interruption handling. <a aria-label="Open interruption architecture diagram at full size" href="/yield-architecture.svg" rel="noreferrer" target="_blank">Open full-size diagram ↗</a></figcaption>
+              </figure>
+              <p>A transcript tells us which words have arrived, but a completed text segment may still belong to an unfinished expression. Our design therefore treats text evaluation and observation boundaries as separate responsibilities. The next design choice is how to supply the boundary information alongside the text.</p>
+              <p>We explored two approaches to this question. <strong>AI Rudder – Helm Bearing</strong> pairs streaming transcription with separate speech-boundary information. <strong>AI Rudder – Helm Swift</strong> provides turn-related signals alongside the transcript. These approaches give the system different ways to maintain the observation window; in both, the interruption policy checks the available evidence to decide whether to request a stop.</p>
+            </section>
+            <section id="helm-bearing-reading-an-expression-as-it-develops">
+              <h2>Helm Bearing: reading an expression as it develops</h2>
+              <p>The streaming-transcription approach works with text that arrives progressively and may be revised. Each eligible update provides another opportunity to check the text conditions while an observation is still open and awaiting an interruption decision.</p>
+              <p>Consider “Yeah…” followed by “but I need to change the date.” A policy may leave the acknowledgment alone, then check the later text against its conditions for an interruption. This depends on the text belonging to an active observation that has not already issued an interruption.</p>
+              <p>This approach also separates transcription completion from conversational completion. A completed text segment may be part of a longer utterance. Text updates and speech-boundary information therefore serve different purposes: one supplies the text to check against the policy, while the other helps define the observation.</p>
+              <figure class="architecture-figure">
+                <a aria-label="Open streaming transcription diagram at full size" href="/yield-bearing.svg" rel="noreferrer" target="_blank"><img alt="Streaming transcription approach: open an observation, receive text updates, check text conditions before an interruption is issued, and close the observation." decoding="async" height="270" loading="lazy" src="/yield-bearing.svg" width="960"/></a>
+                <figcaption>Figure 2. Following a developing expression through streaming text. <a aria-label="Open streaming transcription diagram at full size" href="/yield-bearing.svg" rel="noreferrer" target="_blank">Open full-size diagram ↗</a></figcaption>
+              </figure>
+            </section>
+            <section id="helm-swift-adding-turn-structure-to-the-evidence">
+              <h2>Helm Swift: adding turn structure to the evidence</h2>
+              <p>A turn-aware approach adds information about the structure of speech: a turn beginning, continuing, approaching an end, or resuming. These signals help maintain the observation as the user’s expression unfolds.</p>
+              <p>A tentative ending should remain revisable. If the user resumes, the system can continue following the expression rather than treating the pause as a definitive boundary. A completed turn then provides a natural point to release the observation.</p>
+              <p>Turn structure and conversational intent answer different questions. Knowing that a user has started a turn does not establish that the agent should stop. The interruption policy still checks the current text, including whether it matches an acknowledgment, together with the conditions for issuing an interruption.</p>
+              <figure class="architecture-figure">
+                <a aria-label="Open turn-aware signals diagram at full size" href="/yield-swift.svg" rel="noreferrer" target="_blank"><img alt="Turn-aware approach: a turn begins, text and turn state update, the policy checks text conditions before an interruption is issued, and the turn ends." decoding="async" height="270" loading="lazy" src="/yield-swift.svg" width="960"/></a>
+                <figcaption>Figure 3. Combining turn structure with text conditions. <a aria-label="Open turn-aware signals diagram at full size" href="/yield-swift.svg" rel="noreferrer" target="_blank">Open full-size diagram ↗</a></figcaption>
+              </figure>
+            </section>
+            <section id="make-the-decision-policy-explicit">
+              <h2>Make the decision policy explicit</h2>
+              <p>A domain-specific language (DSL) can separate interruption policy from the mechanics of receiving speech events. It provides a clear way to express what opens an observation, which evidence can support yielding, and what closes the current expression.</p>
+              <p>This separation makes the decision process inspectable. Speech onset starts an opportunity to listen. New text can be checked while the observation is open and no interruption has been issued. A boundary ends an observation. The policy determines when those signals justify an action, while playback state determines whether that action is applicable.</p>
+              <p>Once an interruption is issued, it remains recorded for that observation. Later transcript updates do not revoke it or issue the same action again. Keeping the action associated with its observation makes the boundary between ongoing evaluation and an issued interruption explicit.</p>
+            </section>
+            <section id="evaluate-the-conversation-not-just-the-trigger">
+              <h2>Evaluate the conversation, not just the trigger</h2>
+              <p>A useful evaluation includes acknowledgment, explicit requests, and expressions that begin as one and develop into the other. Replaying the same inputs across policy versions helps reveal whether a change improves response timing while introducing missed requests or unnecessary interruptions.</p>
+              <p>These outcomes need to be considered together: did the agent yield when the user needed the floor, did it keep speaking when the user was following along, and did it act at an appropriate point in the expression?</p>
+              <p>The final check belongs in the audio experience. A decision record shows that an interruption was requested; listening to the interaction establishes whether playback actually stopped and the user could continue naturally.</p>
+            </section>
+            <section id="interruption-is-a-decision-over-time">
+              <h2>Interruption is a decision over time</h2>
+              <p>Helm Bearing and Helm Swift represent two ways of organizing speech evidence around the same conversational goal. During overlapping speech, the system follows the current expression and checks incoming evidence against its interruption policy. While the observation remains open and no interruption has been issued, later text can still be evaluated. The aim is to decide when to yield using the evidence available at that point.</p>
+            </section>
+          </div>
+        </section>
+      </article>
+      <footer>
+        <a class="brand" href="https://www.heycall-e.com/"><img alt="CALL-E" class="brand-logo" src="/logo-call-e.svg?v=3"/></a>
+        <p><a href="https://docs.heycall-e.com/">Developer docs</a> · <a href="https://github.com/CALLE-AI">GitHub</a></p>
+        <span>© 2026 CALL-E</span>
+      </footer>
+    </main>
+  </body>
+</html>

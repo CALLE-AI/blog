@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc" width="900" height="1000" viewBox="0 0 900 1000">
+  <title id="title">Scene storyboard</title>
+  <desc id="desc">An illustrative expression develops from an acknowledgment into a request. Policy checks continue before an interruption is issued.</desc>
+  <rect width="900" height="1000" rx="24" fill="#f7f6f1"/>
+  <g font-family="Arial,sans-serif">
+    <text x="40" y="54" font-size="15" letter-spacing="2" fill="#696862">ONE EXPRESSION, MORE EVIDENCE</text>
+    <text x="40" y="98" font-size="30" fill="#171714">When “yeah” becomes a request.</text>
+    <rect x="40" y="126" width="820" height="100" rx="14" fill="#eeece5"/>
+    <text x="64" y="157" font-size="13" fill="#696862" letter-spacing="1">AGENT IS SPEAKING</text>
+    <text x="64" y="192" font-size="22" fill="#171714">“Your appointment is on Thursday afternoon…”</text>
+    <rect x="40" y="252" width="820" height="170" rx="14" fill="#fff" stroke="#d7d5cc"/>
+    <text x="64" y="289" font-size="18" fill="#696862">01</text>
+    <text x="109" y="289" font-size="17" fill="#696862">An acknowledgment</text>
+    <text x="64" y="335" font-size="29" fill="#171714">“Yeah…”</text>
+    <text x="64" y="375" font-size="17" fill="#696862">The user may simply be following along.</text>
+    <text x="64" y="402" font-size="14" fill="#51430b">Keep listening</text>
+    <rect x="40" y="442" width="820" height="170" rx="14" fill="#fff" stroke="#d7d5cc"/>
+    <text x="64" y="479" font-size="18" fill="#696862">02</text>
+    <text x="109" y="479" font-size="17" fill="#696862">The expression continues</text>
+    <text x="64" y="525" font-size="29" fill="#171714">“Yeah, but…”</text>
+    <text x="64" y="565" font-size="17" fill="#696862">Later text can be checked while the observation is open.</text>
+    <text x="64" y="592" font-size="14" fill="#51430b">Recheck the policy</text>
+    <rect x="40" y="632" width="820" height="170" rx="14" fill="#fff2ad" stroke="#d7d5cc"/>
+    <text x="64" y="669" font-size="18" fill="#696862">03</text>
+    <text x="109" y="669" font-size="17" fill="#696862">A request becomes clear</text>
+    <text x="64" y="715" font-size="29" fill="#171714">“…I need to change the date.”</text>
+    <text x="64" y="755" font-size="17" fill="#696862">The user is asking to redirect the conversation.</text>
+    <text x="64" y="782" font-size="14" fill="#51430b">Request an interruption when policy conditions are met</text>
+    <path d="M40 851 H860" stroke="#d7d5cc"/>
+    <text x="40" y="889" font-size="18" fill="#171714">If the user only says “Yeah.”</text>
+    <text x="40" y="922" font-size="18" fill="#696862">The acknowledgment can end without interrupting the agent.</text>
+    <text x="40" y="965" font-size="13" fill="#696862">Illustrative example before an interruption is issued. No exact trigger points or measured timing.</text>
+  </g>
+</svg>

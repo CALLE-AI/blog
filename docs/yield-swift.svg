@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc" width="960" height="270" viewBox="0 0 960 270">
+  <title id="title">Turn-aware signals</title>
+  <desc id="desc">Establish context, update text and turn state, check text conditions, and release the observation.</desc>
+  <rect width="960" height="270" rx="18" fill="#f7f6f1"/>
+  <text x="32" y="46" font-family="Arial,sans-serif" font-size="23" fill="#171714">Turn-aware signals: combine boundaries with text</text>
+  <rect x="32" y="84" width="207" height="98" rx="10" fill="white" stroke="#d7d5cc"/>
+  <text x="48" y="124" font-family="Arial,sans-serif" font-size="17" fill="#171714">Turn begins</text>
+  <text x="48" y="151" font-family="Arial,sans-serif" font-size="13" fill="#696862">Establish context</text>
+  <path d="M243 133 h15 l-5 -5 m5 5 l-5 5" fill="none" stroke="#a68a17" stroke-width="2"/>
+  <rect x="262" y="84" width="207" height="98" rx="10" fill="white" stroke="#d7d5cc"/>
+  <text x="278" y="124" font-family="Arial,sans-serif" font-size="17" fill="#171714">Speech develops</text>
+  <text x="278" y="151" font-family="Arial,sans-serif" font-size="13" fill="#696862">Update text and turn state</text>
+  <path d="M473 133 h15 l-5 -5 m5 5 l-5 5" fill="none" stroke="#a68a17" stroke-width="2"/>
+  <rect x="492" y="84" width="207" height="98" rx="10" fill="#fff2ad" stroke="#d7d5cc"/>
+  <text x="508" y="124" font-family="Arial,sans-serif" font-size="17" fill="#171714">Check text conditions</text>
+  <text x="508" y="151" font-family="Arial,sans-serif" font-size="13" fill="#696862">Before an interruption is issued</text>
+  <path d="M703 133 h15 l-5 -5 m5 5 l-5 5" fill="none" stroke="#a68a17" stroke-width="2"/>
+  <rect x="722" y="84" width="207" height="98" rx="10" fill="white" stroke="#d7d5cc"/>
+  <text x="738" y="124" font-family="Arial,sans-serif" font-size="17" fill="#171714">Turn ends</text>
+  <text x="738" y="151" font-family="Arial,sans-serif" font-size="13" fill="#696862">Release the observation</text>
+  <text x="32" y="227" font-family="Arial,sans-serif" font-size="14" fill="#696862">A tentative ending may be revised if speech resumes. Turn boundaries alone do not establish intent.</text>
+</svg>

@@ -16,7 +16,7 @@
     <meta content="How voice agents use speech evidence to decide when to yield." name="twitter:description"/>
     <meta content="https://blog.heycall-e.com/og.png" name="twitter:image"/>
     <link href="/_next/static/css/index.Bre-kywb.css?v=4" rel="stylesheet"/>
-    <link href="/the-moment-to-yield/article.css?v=2" rel="stylesheet"/>
+    <link href="/the-moment-to-yield/article.css?v=3" rel="stylesheet"/>
     <link href="/the-moment-to-yield/turnbench.css?v=2" rel="stylesheet"/>
     <script defer src="/_vendor/d3.v7.9.0.min.js"></script>
     <script defer src="/the-moment-to-yield/turnbench.js?v=2"></script>
@@ -39,6 +39,12 @@
             <p>By Xiaoya Gan and Zhengxiang Zhu</p><time datetime="2026-09-24">September 24, 2026</time>
           </div>
         </section>
+        <div class="benchmark-intro">
+          <div class="prose">
+            <p>Knowing when to yield means detecting real interruptions without stopping for every acknowledgment. Our Helm Swift and Helm Bearing models are now listed on TurnBench’s interruption benchmark, giving us an external view of how each model balances detection and false alarms.</p>
+            <p class="benchmark-guide">Toward the upper right, models detect more interruptions with fewer false alarms. Smaller dots indicate lower median detection latency.</p>
+          </div>
+        </div>
         <figure class="benchmark-figure" id="turnbench-results" aria-label="TurnBench interruption detection results">
           <div id="recall-fpr-layout">
             <div class="rf-heading"><h2>Recall vs. False-positive Rate</h2><span class="text-small text-muted">16 of 23 models</span></div>

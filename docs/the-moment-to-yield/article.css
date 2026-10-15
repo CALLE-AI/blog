@@ -61,6 +61,14 @@ body {
 }
 
 .hero { padding-bottom: 48px; }
+.benchmark-intro {
+  width: 100%; max-width: 1040px; margin: 0 auto 32px;
+  padding: 0 clamp(24px, 5vw, 64px);
+}
+.benchmark-intro .prose p:last-child { margin-bottom: 0; }
+.benchmark-intro .prose .benchmark-guide {
+  color: var(--muted); font: 14px/1.6 Geist, Arial, sans-serif;
+}
 .benchmark-figure {
   width: 100%; max-width: 1040px; margin: 0 auto;
   padding: 0 clamp(24px, 5vw, 64px);

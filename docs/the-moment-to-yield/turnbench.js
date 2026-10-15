@@ -29,15 +29,12 @@
       svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(${opt.inset?14:15},${(t+b)/2}) rotate(-90)`).attr('text-anchor','middle').text(opt.inset?'Recall (%)':'Recall (%) · Higher is better');
     }
     function paintPoints(svg,items,x,y){
-      [...items].sort((a,b)=>Number(!!a.kind)-Number(!!b.kind)).forEach(d=>svg.append('circle').attr('data-model',d.name).attr('data-latency',d.latency).attr('cx',x(d.fpr)).attr('cy',y(d.recall)).attr('r',radius(d)).attr('fill',color(d)).attr('fill-opacity',d.kind?.86:.62));
+      [...items].sort((a,b)=>Number(!!a.kind)-Number(!!b.kind)).forEach(d=>svg.append('circle').attr('data-model',d.name).attr('data-latency',d.latency).attr('cx',x(d.fpr)).attr('cy',y(d.recall)).attr('r',radius(d)).attr('fill',color(d)).attr('fill-opacity',d.kind?1:.62));
     }
     function draw(){
       tip.hidden=true;
       const w=host.clientWidth,narrow=w<550,h=narrow?450:545,b={l:64,r:w-15,t:35,b:h-54};
       d3.select(host).selectAll('*').remove();
-      const size=d3.select(root.querySelector('.rf-size'));size.selectAll('*').remove();
-      const lw=Math.min(w,470),lh=28,legend=size.append('svg').attr('class','rf-chart').attr('width',lw).attr('height',lh).attr('viewBox',`0 0 ${lw} ${lh}`).attr('aria-label','Circle area represents detection latency p50. Smaller is faster.');
-      legend.append('text').attr('x',0).attr('y',20).text('Latency p50 · Smaller is faster');
       const svg=d3.select(host).append('svg').attr('class','rf-chart rf-overview').attr('width',w).attr('height',h).attr('viewBox',`0 0 ${w} ${h}`).attr('role','img').attr('aria-label','Sixteen TurnBench interruption models with Recall at least 80 percent and FPR at most 15 percent. Recall increases upward, FPR decreases to the right. Circle area represents median detection latency. All points use their true benchmark coordinates.');
       const ex=d3.extent([...data.map(d=>d.fpr),15]),ey=d3.extent([80,100,...data.map(d=>d.recall)]),pad=(ex[1]-ex[0])*.045;
       const x=d3.scaleLinear().domain([ex[0]-pad,ex[1]+pad]).range([b.r-10,b.l+10]),y=d3.scaleLinear().domain(ey).range([b.b-10,b.t+10]);
@@ -53,7 +50,7 @@
       labels.forEach(d=>{
         if(narrow&&!d.kind&&!['p99lab turn-1-mini','SPX-AI MicroCF','WavLM Base Causal','Neosapience Nunchi v1 (Single-Channel)'].includes(d.name))return;
         const name=d.kind?(narrow?'AI Rudder '+(d.kind==='swift'?'Swift':'Bearing'):'AI Rudder '+d.label):d.label;
-        const t=svg.append('text').attr('class','rf-label').style('font-weight',d.kind?500:400).text(name),r=radius(d);
+        const t=svg.append('text').attr('class',d.kind?'rf-label rf-label-ai':'rf-label').text(name),r=radius(d);
         const cands=d.kind?[[-r-8,4,'end'],[-r-8,-9,'end'],[-r-8,-18,'end'],[-r-8,27,'end'],[-r-8,40,'end'],[-r-8,-32,'end']]:[[r+6,4,'start'],[-r-6,4,'end'],[0,-r-7,'middle'],[0,r+18,'middle'],[r+7,-12,'start'],[-r-7,-12,'end'],[r+7,22,'start'],[-r-7,22,'end'],[0,-r-24,'middle'],[0,r+35,'middle'],[-r-7,-28,'end'],[r+7,-28,'start'],[-r-7,38,'end'],[r+7,38,'start']];
         let placed=false,chosen;
         for(const [dx,dy,anchor] of cands){t.attr('x',x(d.fpr)+dx).attr('y',y(d.recall)+dy).attr('text-anchor',anchor);const bb=t.node().getBBox();

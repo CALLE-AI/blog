@@ -2,14 +2,14 @@
     #recall-fpr-layout .rf-heading{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px 18px;margin-bottom:8px;padding-right:55px}
     #recall-fpr-layout h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;margin:0}
     #recall-fpr-layout .rf-legends{display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px;margin-top:20px}
-    #recall-fpr-layout .rf-legends span{display:inline-flex;align-items:center;gap:7px}
+    #recall-fpr-layout .rf-legends span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
     #recall-fpr-layout .rf-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted-foreground)}
     #recall-fpr-layout .rf-dot.ai{background:var(--viz-series-1)}
     #recall-fpr-layout .rf-region{display:inline-block;width:16px;height:11px;background:color-mix(in srgb,var(--green) 14%,var(--background))}
-    #recall-fpr-layout .rf-size{margin-top:8px}
     #recall-fpr-layout .rf-main{width:100%;margin-top:6px}
     #recall-fpr-layout .rf-chart{display:block;overflow:visible}
     #recall-fpr-layout .rf-chart text{fill:var(--foreground);font-size:12px;font-weight:400}
+    #recall-fpr-layout .rf-chart .rf-label-ai{fill:var(--viz-series-1);font-weight:600}
     #recall-fpr-layout .rf-chart .tick text{fill:var(--muted-foreground)}
     #recall-fpr-layout .rf-chart .domain,#recall-fpr-layout .rf-chart .tick line{stroke:var(--border)}
     #recall-fpr-layout .rf-tooltip{position:absolute;pointer-events:none;max-width:min(290px,calc(100% - 24px));padding:9px 11px;background:var(--popover);color:var(--popover-foreground);border:1px solid var(--border);border-radius:5px;z-index:3;box-sizing:border-box;white-space:pre-line}

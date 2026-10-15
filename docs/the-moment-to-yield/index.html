@@ -16,7 +16,10 @@
     <meta content="How voice agents use speech evidence to decide when to yield." name="twitter:description"/>
     <meta content="https://blog.heycall-e.com/og.png" name="twitter:image"/>
     <link href="/_next/static/css/index.Bre-kywb.css?v=4" rel="stylesheet"/>
-    <link href="/the-moment-to-yield/article.css" rel="stylesheet"/>
+    <link href="/the-moment-to-yield/article.css?v=3" rel="stylesheet"/>
+    <link href="/the-moment-to-yield/turnbench.css?v=2" rel="stylesheet"/>
+    <script defer src="/_vendor/d3.v7.9.0.min.js"></script>
+    <script defer src="/the-moment-to-yield/turnbench.js?v=2"></script>
   </head>
   <body class="antialiased">
     <main>
@@ -36,6 +39,28 @@
             <p>By Xiaoya Gan and Zhengxiang Zhu</p><time datetime="2026-09-24">September 24, 2026</time>
           </div>
         </section>
+        <div class="benchmark-intro">
+          <div class="prose">
+            <p>Knowing when to yield means detecting real interruptions without stopping for every acknowledgment. Our Helm Swift and Helm Bearing models are now listed on TurnBench’s interruption benchmark, giving us an external view of how each model balances detection and false alarms.</p>
+            <p class="benchmark-guide">Toward the upper right, models detect more interruptions with fewer false alarms. Smaller dots indicate lower median detection latency.</p>
+          </div>
+        </div>
+        <figure class="benchmark-figure" id="turnbench-results" aria-label="TurnBench interruption detection results">
+          <div id="recall-fpr-layout">
+            <div class="rf-heading"><h2>Recall vs. False-positive Rate</h2><span class="text-small text-muted">16 of 23 models</span></div>
+            <div class="text-small text-muted">TurnBench Interruption · Recall ≥ 80%, FPR ≤ 15% · October 15, 2026</div>
+            <div class="rf-legends text-small">
+              <span><i class="rf-dot ai"></i>AI Rudder</span><span><i class="rf-dot"></i>Other models</span>
+              <span aria-label="Reference region based on the medians of all 23 models: Recall ≥ 90.7%, FPR ≤ 9.3%. Not an official TurnBench rating."><i class="rf-region"></i>High Recall / low FPR</span>
+              <span aria-label="Circle area represents detection latency p50. Smaller is faster.">Latency p50 · Smaller is faster</span>
+            </div>
+            <div class="rf-main"></div>
+            <div class="rf-tooltip text-small" role="tooltip" hidden></div>
+            <div class="rf-access sr-only" aria-live="polite"></div>
+          </div>
+          <noscript><p>AI Rudder Helm Swift: Recall 93.8%, FPR 4.8%, median detection latency 1,049 ms. Helm Bearing: Recall 90.7%, FPR 5.1%, median detection latency 1,434 ms.</p></noscript>
+          <figcaption><a href="https://turnbench.sesame.com/" target="_blank" rel="noreferrer">View the full TurnBench Interruption leaderboard ↗</a></figcaption>
+        </figure>
         <section class="article-grid">
           <div class="prose">
             <section id="opening">

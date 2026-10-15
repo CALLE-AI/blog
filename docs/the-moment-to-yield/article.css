@@ -59,3 +59,13 @@ body {
     scroll-behavior: auto;
   }
 }
+
+.hero { padding-bottom: 48px; }
+.benchmark-figure {
+  width: 100%; max-width: 1040px; margin: 0 auto;
+  padding: 0 clamp(24px, 5vw, 64px);
+}
+.benchmark-figure figcaption {
+  margin-top: 14px; color: var(--muted); font: 13px/1.5 Geist, Arial, sans-serif;
+}
+.benchmark-figure figcaption a { text-decoration: underline; text-underline-offset: 3px; }

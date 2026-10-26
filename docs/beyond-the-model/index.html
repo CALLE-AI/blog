@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="blog-version" content="v20261026-205729">
+<title>Beyond the Model: Building a Harness for a Voice Agent | CALL-E</title><meta name="description" content="How a voice agent harness tracks input, tool execution, and playback history—and how we decide which controls to keep."><link rel="canonical" href="https://blog.heycall-e.com/beyond-the-model/"><meta property="og:title" content="Beyond the Model: Building a Harness for a Voice Agent"><meta property="og:description" content="How a voice agent harness tracks input, tool execution, and playback history—and how we decide which controls to keep."><meta property="og:type" content="article"><meta property="og:url" content="https://blog.heycall-e.com/beyond-the-model/"><meta property="og:image" content="https://blog.heycall-e.com/beyond-the-model-social.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Beyond the Model — voice agent harness controls for input, tools, and history"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Beyond the Model: Building a Harness for a Voice Agent"><meta name="twitter:description" content="How a voice agent harness tracks input, tool execution, and playback history—and how we decide which controls to keep."><meta name="twitter:image" content="https://blog.heycall-e.com/beyond-the-model-social.png">
+<link rel="stylesheet" href="/_next/static/css/index.Bre-kywb.css?v=4"><link rel="stylesheet" href="/beyond-the-model/article.css?v=v20261026-205729"></head>
+<body class="antialiased"><main><div class="reading-progress" aria-hidden="true"></div><header class="site-header"><a class="brand" href="https://www.heycall-e.com/" aria-label="CALL-E home"><img class="brand-logo" src="/logo-call-e.svg?v=3" alt="CALL-E" width="134" height="44"></a><a class="blog-nav-current" href="/">Blog</a><a class="header-cta" href="https://www.heycall-e.com/">Explore CALL-E</a></header>
+<article id="article"><section class="hero harness-hero" id="top"><h1>Beyond the Model:<br>Building a Harness for a Voice Agent</h1><p class="dek">Start with a failed call, identify the missing state, add a control, and test whether it earns its place</p><div class="byline"><p>Engineering · τ-voice</p><time datetime="2026-10-26">October 26, 2026</time></div></section>
+<div class="harness-benchmark"><aside class="reading-note result-lead">
+<strong class="result-title">Our results on τ-voice</strong>
+<figure class="results-chart" aria-label="Task completion scores by customer simulator">
+<div class="result-chart-meta"><span>Published results · October 26, 2026</span><span>Our run · September 26, 2026</span></div>
+<div class="result-panels"><section class="result-panel" aria-label="Standard">
+<div class="result-panel-heading"><h3>Standard<span class="result-group-count">16 results</span></h3><p>GPT-4.1 customer simulator</p></div>
+<div class="result-bars" role="list"><div class="result-bar-row result-ours" role="listitem" data-score="83.89" data-system="ours" data-group="standard" data-submission="ai-rudder-standard-va20260926a">
+<div class="result-bar-label"><span class="result-system">AI Rudder Voice Agent (CALL-E Backend)</span><strong class="result-value">83.89<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:83.89%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="81.72" data-system="gpt-live-1" data-group="standard" data-submission="gpt-live-1-diamond-alpha_openai_2026-09-09">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-live-1-diamond-alpha_openai_2026-09-09/submission.json">gpt-live-1</a></span><strong class="result-value">81.72<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:81.72%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="80.42" data-system="Ava Zero" data-group="standard" data-submission="ava-zero_avartha_2026-10-22">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/ava-zero_avartha_2026-10-22/submission.json">Ava Zero</a></span><strong class="result-value">80.42<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:80.42%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="75.38" data-system="Pine Voice Preview" data-group="standard" data-submission="pine-voice-preview-user-sim-v1-0_pineai_2026-08-17">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/pine-voice-preview-user-sim-v1-0_pineai_2026-08-17/submission.json">Pine Voice Preview</a></span><strong class="result-value">75.38<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:75.38%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="67.32" data-system="grok-voice-think-fast-1.0" data-group="standard" data-submission="grok-voice-think-fast-1-0_xai_2026-04-21">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/grok-voice-think-fast-1-0_xai_2026-04-21/submission.json">grok-voice-think-fast-1.0</a></span><strong class="result-value">67.32<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:67.32%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="62.53" data-system="grok-voice-think-fast-2.0" data-group="standard" data-submission="grok-voice-think-fast-2-0_xai_2026-08-06">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/grok-voice-think-fast-2-0_xai_2026-08-06/submission.json">grok-voice-think-fast-2.0</a></span><strong class="result-value">62.53<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:62.53%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="53.67" data-system="qwen3.5-omni-plus-realtime" data-group="standard" data-submission="qwen3-5-omni-plus-realtime_qwen_2026-08-06">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/qwen3-5-omni-plus-realtime_qwen_2026-08-06/submission.json">qwen3.5-omni-plus-realtime</a></span><strong class="result-value">53.67<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:53.67%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="43.85" data-system="gemini-3.1-flash-live-preview-thinking-high" data-group="standard" data-submission="gemini-3-1-flash-live-preview-thinking-high_google_2026-04-02">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gemini-3-1-flash-live-preview-thinking-high_google_2026-04-02/submission.json">gemini-3.1-flash-live-preview-thinking-high</a></span><strong class="result-value">43.85<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:43.85%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="42.43" data-system="gpt-realtime-2" data-group="standard" data-submission="gpt-realtime-2_openai_2026-06-29">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-realtime-2_openai_2026-06-29/submission.json">gpt-realtime-2 · xhigh</a></span><strong class="result-value">42.43<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:42.43%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="38.55" data-system="gpt-realtime-2" data-group="standard" data-submission="gpt-realtime-2-minimal_openai_2026-07-01">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-realtime-2-minimal_openai_2026-07-01/submission.json">gpt-realtime-2 · minimal</a></span><strong class="result-value">38.55<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:38.55%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="38.33" data-system="grok-voice-fast-1.0" data-group="standard" data-submission="xai-realtime_sierra_2026-03-03">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/xai-realtime_sierra_2026-03-03/submission.json">grok-voice-fast-1.0</a></span><strong class="result-value">38.33<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:38.33%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="35.27" data-system="gpt-realtime-1.5" data-group="standard" data-submission="gpt-realtime-1.5_sierra_2026-03-03">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-realtime-1.5_sierra_2026-03-03/submission.json">gpt-realtime-1.5</a></span><strong class="result-value">35.27<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:35.27%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="31.20" data-system="Cascaded baseline" data-group="standard" data-submission="livekit-cascaded_livekit_2026-05-19">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/livekit-cascaded_livekit_2026-05-19/submission.json">Cascaded baseline</a></span><strong class="result-value">31.20<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:31.20%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="30.42" data-system="gpt-realtime-1.0" data-group="standard" data-submission="gpt-realtime-1-0_openai_2026-04-13">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-realtime-1-0_openai_2026-04-13/submission.json">gpt-realtime-1.0</a></span><strong class="result-value">30.42<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:30.42%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="28.62" data-system="gemini-3.1-flash-live-preview-thinking-minimal" data-group="standard" data-submission="gemini-3-1-flash-live-preview-thinking-minimal_google_2026-04-13">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gemini-3-1-flash-live-preview-thinking-minimal_google_2026-04-13/submission.json">gemini-3.1-flash-live-preview-thinking-minimal</a></span><strong class="result-value">28.62<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:28.62%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="25.77" data-system="gemini-live-2.5-flash-native-audio" data-group="standard" data-submission="gemini-live-2.5-flash_sierra_2026-03-03">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gemini-live-2.5-flash_sierra_2026-03-03/submission.json">gemini-live-2.5-flash-native-audio</a></span><strong class="result-value">25.77<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:25.77%"></span></div>
+</div></div>
+<div class="result-axis" aria-hidden="true"><span>0</span><span>25</span><span>50</span><span>75</span><span>100%</span></div>
+</section>
+<section class="result-panel" aria-label="Custom">
+<div class="result-panel-heading"><h3>Custom<span class="result-group-count">6 results</span></h3><p>GPT-5.5 customer simulator</p></div>
+<div class="result-bars" role="list"><div class="result-bar-row result-ours" role="listitem" data-score="88.82" data-system="ours" data-group="custom" data-submission="ai-rudder-custom-va20260926a">
+<div class="result-bar-label"><span class="result-system">AI Rudder Voice Agent (CALL-E Backend)</span><strong class="result-value">88.82<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:88.82%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="86.23" data-system="gpt-live-1" data-group="custom" data-submission="gpt-live-1-diamond-alpha-user-sim-gpt-5-5_openai_2026-09-09">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-live-1-diamond-alpha-user-sim-gpt-5-5_openai_2026-09-09/submission.json">gpt-live-1</a></span><strong class="result-value">86.23<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:86.23%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="80.18" data-system="Pine Voice Preview" data-group="custom" data-submission="pine-voice-preview-user-sim-gpt-5-5_pineai_2026-08-17">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/pine-voice-preview-user-sim-gpt-5-5_pineai_2026-08-17/submission.json">Pine Voice Preview</a></span><strong class="result-value">80.18<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:80.18%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="79.59" data-system="Grok Voice 3.0" data-group="custom" data-submission="grok-voice-3-0_xai_2026-10-14">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/grok-voice-3-0_xai_2026-10-14/submission.json">Grok Voice 3.0</a></span><strong class="result-value">79.59<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:79.59%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="74.80" data-system="grok-voice-think-fast-1.0 + tool-mentor" data-group="custom" data-submission="grok-voice-think-fast-1-0-tool-mentor_pickle_2026-07-07">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/grok-voice-think-fast-1-0-tool-mentor_pickle_2026-07-07/submission.json">grok-voice-think-fast-1.0 + tool-mentor</a></span><strong class="result-value">74.80<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:74.80%"></span></div>
+</div>
+<div class="result-bar-row" role="listitem" data-score="51.24" data-system="gpt-realtime-2" data-group="custom" data-submission="gpt-realtime-2_openai_2026-06-24">
+<div class="result-bar-label"><span class="result-system"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-realtime-2_openai_2026-06-24/submission.json">gpt-realtime-2 · xhigh</a></span><strong class="result-value">51.24<span>%</span></strong></div>
+<div class="result-bar-track" aria-hidden="true"><span class="result-bar-fill" style="width:51.24%"></span></div>
+</div></div>
+<div class="result-axis" aria-hidden="true"><span>0</span><span>25</span><span>50</span><span>75</span><span>100%</span></div>
+</section></div>
+<figcaption><div class="result-legend"><span><i class="result-key result-key-ours"></i>AI Rudder Voice Agent (CALL-E Backend) · Self-evaluated</span><span><i class="result-key"></i>Published results</span></div><p class="result-verification">Our scores are self-evaluated. We are awaiting an official rerun.</p><p>Three-domain mean (Pass@1) · All results in these two simulator groups. <a href="#section-4">Domain scores and methodology ↓</a></p></figcaption>
+</figure>
+</aside><figure class="harness-video">
+<div class="video-frame">
+<iframe width="960" height="540" src="https://www.youtube-nocookie.com/embed/4m1GEKaH7T8?rel=0&amp;playsinline=1" title="YouTube video" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</div>
+<figcaption><a href="https://www.youtube.com/watch?v=4m1GEKaH7T8" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></figcaption>
+</figure></div>
+<div class="article-grid harness-content"><div class="prose"><section id="opening"><p>The result gives context for the engineering work below. We did not train or fine-tune the model; we worked on the prompts, state, and control code around it. Without a full harness-off comparison, the score alone cannot tell us how much each change contributed.</p>
+<p>When building voice agents, we keep running into a particular kind of failure: the model knows what to do, but the information it sees does not match what has actually happened on the call.</p>
+<p>A customer is still reading out an identifier when a partial transcript reaches the model. An order has already been updated when the same request executes again. A reply has not finished playing, but both sentences are already in the conversation history. More prompting may not solve these problems: the model cannot account for state that has never been recorded or passed to it.</p>
+<p>Our approach is to <strong>have the program keep track of what was received, what was executed, and what was played—then let the model decide what to do next.</strong> We use <em>harness</em> to mean the workflow prompts, control code, and state management around the model. This article focuses on the latter two.</p>
+<p>The method is straightforward: find where the information diverges, record the state needed to close that gap, control the relevant action, and measure both the benefit and the cost. Waiting for input, suppressing duplicate tool calls, and handling interruptions are three examples of that method.</p>
+</section><section id="section-1"><h2>1. Find where the information diverges</h2>
+<p>In one retail evaluation call, the agent had completed two returns and was asking the customer to confirm a third. The customer said <code>mm-hmm</code>. That response appeared in the playback record, but ASR produced no text to submit. The confirmation never reached the model before the timeout. The customer then asked about the total refund and ended the call. The third return was never executed.</p>
+<p>Looking only at the outcome, it would be easy to label this “the model missed a return” and add “do not overlook customer requests” to the prompt. But align the audio, transcript, and model input, and the break becomes clear: <strong>the customer answered, but the model never received the answer.</strong> The place to investigate is how the confirmation step handles an empty transcript.</p>
+<p>That gives us a change we can test: if the system detects speech during a confirmation step but receives no text, should it ask again? This is still a proposal to validate. Finding the break does not mean we have fixed it.</p>
+<figure class="architecture method-figure">
+<div class="figure-label">Follow all four steps for each change</div>
+<div class="method-grid">
+<div class="method-card"><span class="method-number">01</span><strong>Reconstruct</strong><p>Align audio, model input, tool records, and playback progress.</p><small>Where does the information diverge?</small></div>
+<div class="method-card"><span class="method-number">02</span><strong>Record state</strong><p>Identify facts the program must track, rather than ask the model to guess.</p><small>Is input complete? Has the action executed?</small></div>
+<div class="method-card"><span class="method-number">03</span><strong>Add a control</strong><p>Delay input, block a request, or update conversation history.</p><small>Which action does the code change?</small></div>
+<div class="method-card"><span class="method-number">04</span><strong>Test trade-offs</strong><p>Check target errors, task outcomes, and interaction costs together.</p><small>What improved? What got worse?</small></div>
+</div>
+<figcaption>Input waiting, tool deduplication, and history correction all follow this method.</figcaption>
+</figure>
+
+<p>We usually start with two questions. If the model received all the information and still failed to follow the workflow, the prompt or model may need to change. If information was missing, the status of an action was unclear, or the history differed from what had played, start with the code around the model call.</p>
+<p>The distinction is who makes the decision. A prompt asks the model to follow a rule. Control code can delay invoking the model, withhold a tool request, or directly change the history used on the next turn. Even if a blocked call produces a text message for the model, the program has already made the decision to block it.</p>
+</section><section id="section-2"><h2>2. Track state at the input, tools, and history</h2>
+<p>Place these controls in the full system first. A spoken exchange follows the main <strong>ASR → language model (LLM) → TTS → playback</strong> pipeline. The Bot Prompt is text supplied when invoking the model. Input waiting, tool checks, and history updates are code running around that pipeline.</p>
+<figure class="cascade-figure" aria-labelledby="cascade-title">
+<div class="figure-label" id="cascade-title">Prompts, control code, and state in the voice pipeline</div>
+<div class="cascade-legend"><span><i class="cs-key prompt-key"></i>Text configuration</span><span><i class="cs-key control-key"></i>①②③ Runtime code</span><span><i class="cs-key history-key"></i>Managed messages</span></div>
+<div class="cascade-mobile-hint">Scroll horizontally to explore the full diagram</div>
+<div class="cascade-scroll" tabindex="0" role="region" aria-label="Voice pipeline diagram; scroll horizontally">
+<svg class="cascade-svg" viewBox="0 0 980 630" role="img" aria-labelledby="cascade-svg-title cascade-svg-desc">
+<title id="cascade-svg-title">The ASR–LLM–TTS pipeline and three harness controls</title>
+<desc id="cascade-svg-desc">Customer audio passes through ASR and input handling to the LLM. The Bot Prompt and conversation history also feed the LLM. Tool checks mediate business-tool calls and return results or blocking feedback. Replies pass through TTS to playback. History correction uses estimated playback progress and interruptions to update history for the next turn.</desc>
+<defs><marker id="cs-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="var(--muted)" stroke-width="1.5"/></marker><marker id="cs-arrow-back" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 9 1 L 1 5 L 9 9" fill="none" stroke="var(--muted)" stroke-width="1.5"/></marker></defs>
+<path class="cs-wire " d="M 391 100 V 178" marker-end="url(#cs-arrow)" />
+<path class="cs-wire " d="M 601 100 V 134 H 489 V 178" marker-end="url(#cs-arrow)" />
+<path class="cs-wire " d="M 144 228 H 178" marker-end="url(#cs-arrow)" />
+<path class="cs-wire " d="M 330 228 H 366" marker-end="url(#cs-arrow)" />
+<path class="cs-wire " d="M 542 228 H 630" marker-end="url(#cs-arrow)" />
+<path class="cs-wire " d="M 754 228 H 797" marker-end="url(#cs-arrow)" />
+<path class="cs-wire " d="M 420 273 V 316 H 260 V 378" marker-end="url(#cs-arrow)" marker-start="url(#cs-arrow-back)"/>
+<path class="cs-wire " d="M 351 431 H 426" marker-end="url(#cs-arrow)" marker-start="url(#cs-arrow-back)"/>
+<path class="cs-wire " d="M 866 273 V 487" marker-end="url(#cs-arrow)" />
+<path class="cs-wire history-wire" d="M 898 539 H 951 V 57 H 697" marker-end="url(#cs-arrow)" />
+<g class="cs-box cs-prompt"><rect x="303" y="18" width="176" height="82" rx="10"/><text class="cs-title" x="391" y="48" text-anchor="middle">Bot Prompt</text><text class="cs-small" x="391" y="73" text-anchor="middle">System / workflow rules</text></g>
+<g class="cs-box cs-history"><rect x="507" y="18" width="190" height="82" rx="10"/><text class="cs-title" x="602" y="48" text-anchor="middle">History</text><text class="cs-small" x="602" y="73" text-anchor="middle">User, assistant, tool messages</text></g>
+<g class="cs-box "><rect x="20" y="184" width="124" height="89" rx="10"/><text class="cs-title" x="82" y="214" text-anchor="middle">ASR</text><text class="cs-small" x="82" y="239" text-anchor="middle">Speech → text</text></g>
+<g class="cs-box cs-control"><rect x="178" y="178" width="152" height="106" rx="10"/><text class="cs-title" x="254" y="208" text-anchor="middle">① Input handling</text><text class="cs-small" x="254" y="233" text-anchor="middle">Clean up / wait for more</text><text class="cs-small" x="254" y="254" text-anchor="middle">State: input buffer</text></g>
+<g class="cs-box "><rect x="366" y="184" width="176" height="89" rx="10"/><text class="cs-title" x="454" y="214" text-anchor="middle">LLM</text><text class="cs-small" x="454" y="239" text-anchor="middle">Read → decide next step</text></g>
+<g class="cs-box "><rect x="630" y="184" width="124" height="89" rx="10"/><text class="cs-title" x="692" y="214" text-anchor="middle">TTS</text><text class="cs-small" x="692" y="239" text-anchor="middle">Text → audio</text></g>
+<g class="cs-box "><rect x="797" y="184" width="139" height="89" rx="10"/><text class="cs-title" x="866.5" y="214" text-anchor="middle">Playback</text><text class="cs-small" x="866.5" y="239" text-anchor="middle">Audio to customer</text></g>
+<g class="cs-box cs-control"><rect x="169" y="378" width="182" height="106" rx="10"/><text class="cs-title" x="260" y="408" text-anchor="middle">② Tool checks</text><text class="cs-small" x="260" y="433" text-anchor="middle">Withhold duplicate calls</text><text class="cs-small" x="260" y="454" text-anchor="middle">State: calls in this turn</text></g>
+<g class="cs-box "><rect x="426" y="390" width="170" height="82" rx="10"/><text class="cs-title" x="511" y="420" text-anchor="middle">Business tools</text><text class="cs-small" x="511" y="445" text-anchor="middle">Read / update state</text></g>
+<g class="cs-box cs-control"><rect x="716" y="487" width="182" height="106" rx="10"/><text class="cs-title" x="807" y="517" text-anchor="middle">③ History update</text><text class="cs-small" x="807" y="542" text-anchor="middle">Trim estimated prefix</text><text class="cs-small" x="807" y="563" text-anchor="middle">Keep tool records</text></g>
+<text class="cs-label" x="80" y="164" text-anchor="middle">Customer audio ↓</text>
+<text class="cs-label" x="399" y="148" text-anchor="end">Prompt input</text>
+<text class="cs-label" x="603" y="125" text-anchor="middle">Message input</text>
+<text class="cs-label" x="585" y="212" text-anchor="middle">Reply text</text>
+<text class="cs-label" x="866" y="164" text-anchor="middle">Customer hears reply</text>
+<text class="cs-label" x="261" y="305" text-anchor="middle">Tool call ↓ / Result or feedback ↑</text>
+<text class="cs-label" x="388" y="415" text-anchor="middle">Call →</text>
+<text class="cs-label" x="388" y="456" text-anchor="middle">← Result</text>
+<text class="cs-label" x="847" y="361" text-anchor="middle">Estimated progress</text>
+<text class="cs-label" x="847" y="385" text-anchor="middle">+ interruption</text>
+<text class="cs-label" x="939" y="118" text-anchor="end">Update history</text>
+<text class="cs-label" x="939" y="141" text-anchor="end">For the next turn</text>
+<text class="cs-label" x="170" y="548" text-anchor="start">Blocked: return “not executed” feedback only</text>
+<text class="cs-label" x="170" y="573" text-anchor="start">Allowed: send the result back through the check layer</text>
+</svg></div>
+<figcaption>Orange blocks mark control points, not necessarily separate services. The Bot Prompt guides model reasoning; ①②③ directly control input submission, tool forwarding, and history updates. At interruption, block ③ uses a duration estimate from the player side, not a receipt confirming playback. It need not wait for the full sentence to finish.</figcaption>
+</figure>
+
+<p>The purple Bot Prompt tells the model what it should do. The orange blocks <strong>①②③</strong> are executed by the program. They maintain unsubmitted text, a record of requests within the turn, and reply history. They are not three more system prompts. The next three examples follow those locations.</p>
+<h3>① Input handling: a pause does not always mean the identifier is complete</h3>
+<p><strong>The state to retain is the unsubmitted text and the waiting state.</strong> If every pause immediately triggers a model call, the model may start a lookup with half an identifier.</p>
+<p>Before submitting the text, we inspect its ending. We consider waiting longer only when it looks like spelling, a sequence of individual digits, or a connector such as <code>dash</code> or <code>underscore</code>. If the customer continues, we merge the continuation before passing it to the model. This changes the timing and input of the model call; it does not require the model to first obey a “please wait” instruction.</p>
+<figure class="example-card">
+<div class="example-kicker">Illustration · Not a recorded call</div>
+<div class="example-title">A pause after “dash” may still be part of the same utterance</div>
+<div class="speech-line"><span>Customer</span><p>“A B C dash” <b class="pause-tag">pause</b> “seven”</p></div>
+<div class="example-grid">
+<div class="example-pane"><span class="pane-label">Submit at the pause</span><p>The model receives <code>A B C dash</code> before the identifier is complete.</p></div>
+<div class="example-pane good"><span class="pane-label">Check the ending first</span><p>A trailing connector delays submission. When the customer continues, merge the text into <code>A B C dash seven</code>.</p></div>
+</div>
+<figcaption>This illustrates why waiting can help. Whether to keep waiting still depends on the merged text and the waiting limit.</figcaption>
+</figure>
+
+<p>Detecting silence, finalizing a transcript segment, and deciding to submit the entire utterance are three separate events. An integration needs to define when the timer starts, what happens when speech resumes, and how long the full utterance can be held. Our additional-wait settings were 2.5 seconds for retail and airline, and 1.5 seconds for telecom. These are configuration values, not measured average delays or recommended defaults.</p>
+<p><strong>The cost is unnecessary waiting.</strong> Complete identifiers and ordinary sentences can also match the rules. Our implementation exempts digit strings of exactly five digits or at least ten digits to reduce cases where a completed identifier is held back. Length alone does not establish validity. The measurements that matter are how often we catch an incomplete input and how often we needlessly delay a complete one. We do not yet have comprehensive counts for either.</p>
+<p>ASR spelling cleanup belongs in this same input layer. Splitting <code>YAsInYellow</code> into <code>Y as in Yellow</code> restores separators. Filling in a missing letter from an order database crosses a different boundary. We retain the text before and after processing to inspect unintended changes; we removed one overly aggressive rule after it broke terminology and airport codes.</p>
+<h3>② Tool checks: preventing duplicate writes</h3>
+<p>The evaluated system includes a duplicate-write check. <strong>It records the tool name and arguments of write requests that have returned without an error in the current turn.</strong> If the model asks for the same update again, the program can prevent the request from being sent twice.</p>
+<p>We added a check inside the tool loop. Once the first call returns without an error, its request is added to a set. If the same request arrives again within the turn, the program does not forward it to the business tool. Instead, it returns a “not executed” result to the model.</p>
+<figure class="example-card">
+<div class="example-kicker">Illustration · Not an actual tool log</div>
+<div class="example-title">The model requests two updates; the program forwards one</div>
+<ol class="example-steps">
+<li><span class="step-badge">1</span><div><strong>First request: change order A’s address to B</strong><p>The set is empty → forward to the business tool → receive a response without an error → add the tool name and arguments to the set.</p></div></li>
+<li><span class="step-badge">2</span><div><strong>The model makes the exact same request again</strong><p>The set already contains the request → do not send it again → return “not executed” as tool feedback to the model.</p></div></li>
+</ol>
+<figcaption>If the first call returns an error, a later retry is allowed. “No error” still does not guarantee that the business state is correct.</figcaption>
+</figure>
+
+<p>The main branch can be simplified to:</p>
+<pre><code class="language-text">The model requests an update
+    ↓
+Has the same request returned without an error in this turn?
+    ├─ Yes: do not forward it; return “not executed”
+    └─ No: call the tool; record the request if no error is returned
+    ↓
+Return the result to the model as a tool message and continue
+</code></pre>
+<p>The model may request the same action twice, but the program forwards only the first. <strong>The feedback is text; the execution decision is code.</strong> The check works without the model first understanding “do not repeat this update.”</p>
+<p><strong>The boundary lies in how we define “the same request” and “returned without an error.”</strong> JSON arguments need a canonical representation for comparison. Errors must be recognized according to the tool protocol so that legitimate retries can pass. The set lasts only until the current turn’s reply is finalized. It does not handle duplicates across turns, across processes, or concurrently in flight.</p>
+<p>Timeouts deserve particular care: not receiving a result does not mean the tool did not execute. For operations that could charge a customer twice, the business service still needs an operation ID for idempotency, or a way to query the actual state. This small set is no substitute for a complete retry design.</p>
+<p>Business-policy checks can also run before a call, but they need a clear basis for their decisions. Comparing a tool name and arguments is straightforward. Deciding whether a health-related reason permits cancellation requires natural-language understanding, and we have incorrectly blocked a cancellation this way. Whether to allow, warn, or ask for clarification when information is incomplete must be designed for each rule.</p>
+<h3>③ History correction: generated does not mean heard</h3>
+<p><strong>The state to retain is estimated playback progress and the corresponding reply text.</strong> The model may have written two sentences while the player is still on the first. If the customer interrupts and both sentences remain in history, the next model call will treat words that never played as words already spoken.</p>
+<figure class="example-card">
+<div class="example-kicker">Illustration · Not a recorded call</div>
+<div class="example-title">“The action is done” and “the customer has been told” are different states</div>
+<div class="playback-line"><span class="pane-label">Generated reply</span><p><span class="spoken">Your refund request has been submitted.</span><span class="cut-marker">interrupted here</span><span class="unspoken">Next, let’s confirm your shipping address.</span></p></div>
+<div class="example-grid">
+<div class="example-pane good"><span class="pane-label">Spoken reply history</span><p>Keep “Your refund request has been submitted.” The customer has not heard the next sentence.</p></div>
+<div class="example-pane"><span class="pane-label">Tool record</span><p>Keep the executed refund call and its result. Truncating the reply must not cause another refund.</p></div>
+</div>
+<figcaption>The interruption is shown between sentences for clarity. Actual interruptions often occur mid-sentence, requiring an estimate of how far playback reached.</figcaption>
+</figure>
+
+<p>Our history-management code directly edits the reply message. It estimates the portion the customer heard, retains that prefix, and removes the rest. Existing tool results remain. If a refund has executed but the notification was interrupted, the next turn should finish telling the customer, not issue another refund.</p>
+<p><strong>The cost is estimation error.</strong> Progress here is estimated from the duration of audio successfully written to the player, not a receipt confirming playback. The code combines this with audio duration and text length, with a bias toward keeping less text. If text or TTS is still streaming at interruption and no reliable prefix is available, the history code removes the whole reply. This can remove words the customer did hear.</p>
+<p>There is an exception to prevent repetition: after the same reply has been removed in full twice, it is retained to avoid regenerating it indefinitely. Existing tool results are unaffected by either truncation or deletion.</p>
+<p>This TTS path does not pass character timestamps to the history code, and we have not quantified truncation error. A phone or browser integration should use progress from its player and text–audio alignment where available. Check both excessive deletion and repetition; the estimate is not an exact record of what the customer heard.</p>
+<p>All three examples record state the model cannot verify on its own, then use that state to control a specific action. What the model should ask, or the order in which it should troubleshoot, can still live in the prompt.</p>
+</section><section id="section-3"><h2>3. How we decide which checks to keep</h2>
+<p>The duplicate-write check above uses a recorded fact: an identical request has already returned without an error in this turn. It is enabled in the evaluated system. Other checks prescribe how the model should approach a task. <strong>Code can enforce a rule; whether that rule helps is a separate question.</strong></p>
+<p>We tested a different check: when user details listed orders the model had not yet inspected, it blocked the first update request and listed the orders still to retrieve. It used only tool results already seen during the call and could block at most once per call. The hypothesis was that inspecting every listed order before making a change would help the model choose correctly. But a task may concern only one order, making the extra lookups unnecessary. <strong>We left this check disabled.</strong> Here is how we reached that decision.</p>
+<p>First, we replayed the context just before an error in three retail tasks, with three samples per task for each treatment:</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Replay treatment</th>
+<th align="right">Next step shifted toward the expected lookup or clarification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No intervention</td>
+<td align="right">0/9</td>
+</tr>
+<tr>
+<td>An equivalent reminder appended to the prompt</td>
+<td align="right">0/9</td>
+</tr>
+<tr>
+<td>Check feedback returned at the tool call</td>
+<td align="right">8/9</td>
+</tr>
+</tbody></table></div>
+<p>The expected steps included retrieving order details or asking separately why two orders should be cancelled. <strong>8/9 measures a change in the next action—not successful tool execution or task completion.</strong> The sample covered only three tasks; one baseline already tended to ask a follow-up, and the replay feedback differed from the final check. Reference actions were used only for offline evaluation, never supplied to the running check.</p>
+<p>Next, we ran five tasks four times with the order-inspection check disabled and four times with it enabled: <strong>20 complete calls per setting, 40 in total</strong>. Only this check changed, not the entire harness.</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Complete-call outcome</th>
+<th align="right">Order-inspection check off</th>
+<th align="right">Order-inspection check on</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tasks completed successfully</td>
+<td align="right">12/20</td>
+<td align="right">9/20</td>
+</tr>
+</tbody></table></div>
+<p>The check blocked seven requests. On two tasks selected to watch for regressions, passes fell from 6/8 to 4/8, reaching the pre-set stopping condition. Mean model interaction requests rose from 10.4 to 11.8 per call; these are requests, not customer turns or latency. The customer’s actual answers also differed between runs: on one task, a color preference was volunteered in the two successful off-runs but in none of the four on-runs. Some calls retrieved more details and still made the wrong update. This small comparison did not establish that the check caused the lower score, but it did not justify enabling it either.</p>
+<p><strong>The model more often took the intended next step; we did not establish that this made the full task more likely to succeed.</strong> We therefore kept this experimental check disabled. The duplicate-write check in Section 2 remains enabled; this experiment did not test its effect.</p>
+<p>For any new rule, we ask two questions: did it change the behavior we targeted, and was that change worth keeping over a complete call? We track both the benefit and the cost:</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Change</th>
+<th>Improvement to look for</th>
+<th>Cost to measure alongside it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Input waiting</td>
+<td>Fewer incomplete identifiers submitted early</td>
+<td>Unnecessary delays to complete utterances; added waiting time</td>
+</tr>
+<tr>
+<td>Tool checks</td>
+<td>Duplicate or disallowed actions prevented</td>
+<td>False blocks; extra lookups and follow-up questions</td>
+</tr>
+<tr>
+<td>History correction</td>
+<td>Less unplayed text incorrectly retained</td>
+<td>Played text removed; repeated speech</td>
+</tr>
+</tbody></table></div>
+<p>These are proposed diagnostic measures, not measured gains. Counting triggers is not enough: review recordings and traces to check unnecessary waiting, false blocks, and excessive deletion, alongside task outcomes. A check firing proves that the control ran; it does not prove the rule was worth adding.</p>
+</section><section id="section-4"><h2>4. What the evaluation results tell us</h2>
+<p>τ-voice is a benchmark for voice agents handling customer-service calls. Agents speak with simulated customers, follow business policies, and use tools to complete tasks such as returns, flight changes, and telecom troubleshooting. Calls include accents, background noise, and interruptions, with both sides able to speak and listen at the same time. The main score, pass@1, measures whether the task was completed; latency and turn-taking are measured separately. <a href="https://arxiv.org/abs/2603.13686">Benchmark paper</a>.</p>
+
+<p>We evaluated the system on τ-voice’s retail, airline, and telecom tasks. The agent uses <strong>Deepgram nova-3 → gemini-3.7-flash → ElevenLabs flash v2.5</strong>, without training or fine-tuning by us. The control code runs inside the agent and leaves the evaluator’s business tools and scoring rules unchanged, within the boundary allowed for standard voice submissions. <a href="https://github.com/sierra-research/tau2-bench/blob/main/docs/leaderboard-submission.md#submission-types-standard-vs-custom">Submission rules</a></p>
+<p><strong>Batch: <code>va20260926a</code> · September 26, 2026 · Self-evaluated; not yet officially verified.</strong> Both groups covered all 278 tasks across the three domains, excluding Banking. Standard used GPT-4.1 (temperature 0) to simulate customers; Custom used GPT-5.5 (xhigh). Both used voice simulator v1.0, ElevenLabs v3, and voices generated by us, not the official leaderboard voices.</p>
+<p><strong>Same agent, different customer simulators: complete-system results, not a harness-on versus harness-off comparison.</strong></p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Customer simulator</th>
+<th align="right">Retail · 114 tasks</th>
+<th align="right">Airline · 50 tasks</th>
+<th align="right">Telecom · 114 tasks</th>
+<th align="right">Equal-weight mean across domains</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Standard</td>
+<td align="right">89/114 · 78.07%</td>
+<td align="right">39/50 · 78.00%</td>
+<td align="right">109/114 · 95.61%</td>
+<td align="right"><strong>83.89%</strong></td>
+</tr>
+<tr>
+<td>Custom</td>
+<td align="right">98/114 · 85.96%</td>
+<td align="right">42/50 · 84.00%</td>
+<td align="right">110/114 · 96.49%</td>
+<td align="right"><strong>88.82%</strong></td>
+</tr>
+</tbody></table></div>
+<p>Standard passed <strong>237/278</strong> tasks and Custom passed <strong>250/278</strong>. The overall scores in the table weight the three domain pass rates equally, rather than pooling all tasks into one pass rate.</p>
+<h3>Comparison with published results</h3>
+<p>As of <strong>October 26, 2026</strong>, the tables below cover all <strong>20 published submissions</strong> using the GPT-4.1 and GPT-5.5 customer simulators in the original τ-voice track, alongside our two self-evaluations. Retail, airline, and telecom scores are shown separately; their equal-weight mean is used for sorting within each matched-simulator group. Newer τ³-Voice results use a different benchmark and are excluded. <a href="https://taubench.com/leaderboard?benchmark=voice">Official leaderboard</a> · <a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/manifest.json">Source snapshot</a></p>
+<div class="comparison-results">
+<div class="comparison-heading"><h4>Standard · GPT-4.1 customer simulator</h4><span>16 results</span></div>
+<div class="comparison-table-wrap" role="region" aria-label="standard" tabindex="0"><table class="comparison-table"><thead><tr><th scope="col">System</th><th scope="col">Retail</th><th scope="col">Airline</th><th scope="col">Telecom</th><th scope="col">Mean</th><th scope="col">Result status</th></tr></thead><tbody><tr class="comparison-ours" data-submission="ai-rudder-standard-va20260926a" data-result-group="standard"><th scope="row"><strong>AI Rudder Voice Agent (CALL-E Backend)</strong><span class="comparison-meta">AI Rudder · 2026-09-26</span></th><td data-domain="retail" data-score="78.0701754385965">78.07%</td><td data-domain="airline" data-score="78">78.00%</td><td data-domain="telecom" data-score="95.6140350877193">95.61%</td><td class="comparison-mean" data-mean="83.89473684210526">83.89%</td><td class="comparison-status">Self-evaluated</td></tr>
+<tr data-submission="gpt-live-1-diamond-alpha_openai_2026-09-09" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-live-1-diamond-alpha_openai_2026-09-09/submission.json">gpt-live-1</a><span class="comparison-meta">OpenAI · 2026-09-09 · GPT-6 Astra (medium)</span></th><td data-domain="retail" data-score="78.94736842105263">78.95%</td><td data-domain="airline" data-score="82">82.00%</td><td data-domain="telecom" data-score="84.21052631578947">84.21%</td><td class="comparison-mean" data-mean="81.71929824561403">81.72%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="ava-zero_avartha_2026-10-22" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/ava-zero_avartha_2026-10-22/submission.json">Ava Zero</a><span class="comparison-meta">Avartha · 2026-10-22</span></th><td data-domain="retail" data-score="75.43859649122807">75.44%</td><td data-domain="airline" data-score="86">86.00%</td><td data-domain="telecom" data-score="79.82456140350878">79.82%</td><td class="comparison-mean" data-mean="80.42105263157895">80.42%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="pine-voice-preview-user-sim-v1-0_pineai_2026-08-17" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/pine-voice-preview-user-sim-v1-0_pineai_2026-08-17/submission.json">Pine Voice Preview</a><span class="comparison-meta">Pine AI · 2026-08-17</span></th><td data-domain="retail" data-score="70.17543859649122">70.18%</td><td data-domain="airline" data-score="70">70.00%</td><td data-domain="telecom" data-score="85.96491228070175">85.96%</td><td class="comparison-mean" data-mean="75.38011695906432">75.38%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="grok-voice-think-fast-1-0_xai_2026-04-21" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/grok-voice-think-fast-1-0_xai_2026-04-21/submission.json">grok-voice-think-fast-1.0</a><span class="comparison-meta">xAI · 2026-04-21</span></th><td data-domain="retail" data-score="62.28070175438597">62.28%</td><td data-domain="airline" data-score="66">66.00%</td><td data-domain="telecom" data-score="73.68421052631578">73.68%</td><td class="comparison-mean" data-mean="67.32163742690058">67.32%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="grok-voice-think-fast-2-0_xai_2026-08-06" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/grok-voice-think-fast-2-0_xai_2026-08-06/submission.json">grok-voice-think-fast-2.0</a><span class="comparison-meta">xAI · 2026-08-06</span></th><td data-domain="retail" data-score="59.64912280701754">59.65%</td><td data-domain="airline" data-score="56.00000000000001">56.00%</td><td data-domain="telecom" data-score="71.9298245614035">71.93%</td><td class="comparison-mean" data-mean="62.52631578947368">62.53%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="qwen3-5-omni-plus-realtime_qwen_2026-08-06" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/qwen3-5-omni-plus-realtime_qwen_2026-08-06/submission.json">qwen3.5-omni-plus-realtime</a><span class="comparison-meta">Qwen · 2026-08-06</span></th><td data-domain="retail" data-score="46.49122807017544">46.49%</td><td data-domain="airline" data-score="54">54.00%</td><td data-domain="telecom" data-score="60.526315789473685">60.53%</td><td class="comparison-mean" data-mean="53.67251461988304">53.67%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="gemini-3-1-flash-live-preview-thinking-high_google_2026-04-02" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gemini-3-1-flash-live-preview-thinking-high_google_2026-04-02/submission.json">gemini-3.1-flash-live-preview-thinking-high</a><span class="comparison-meta">Google · 2026-04-02</span></th><td data-domain="retail" data-score="45.614035087719294">45.61%</td><td data-domain="airline" data-score="64">64.00%</td><td data-domain="telecom" data-score="21.929824561403507">21.93%</td><td class="comparison-mean" data-mean="43.847953216374265">43.85%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="gpt-realtime-2_openai_2026-06-29" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-realtime-2_openai_2026-06-29/submission.json">gpt-realtime-2</a><span class="comparison-meta">OpenAI · 2026-06-29 · xhigh</span></th><td data-domain="retail" data-score="47.368421052631575">47.37%</td><td data-domain="airline" data-score="57.99999999999999">58.00%</td><td data-domain="telecom" data-score="21.929824561403507">21.93%</td><td class="comparison-mean" data-mean="42.43274853801169">42.43%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="gpt-realtime-2-minimal_openai_2026-07-01" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-realtime-2-minimal_openai_2026-07-01/submission.json">gpt-realtime-2</a><span class="comparison-meta">OpenAI · 2026-07-01 · minimal</span></th><td data-domain="retail" data-score="39.473684210526315">39.47%</td><td data-domain="airline" data-score="56.00000000000001">56.00%</td><td data-domain="telecom" data-score="20.175438596491226">20.18%</td><td class="comparison-mean" data-mean="38.54970760233919">38.55%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="xai-realtime_sierra_2026-03-03" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/xai-realtime_sierra_2026-03-03/submission.json">grok-voice-fast-1.0</a><span class="comparison-meta">xAI · 2026-03-03</span></th><td data-domain="retail" data-score="38.6">38.60%</td><td data-domain="airline" data-score="36">36.00%</td><td data-domain="telecom" data-score="40.4">40.40%</td><td class="comparison-mean" data-mean="38.333333333333336">38.33%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="gpt-realtime-1.5_sierra_2026-03-03" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-realtime-1.5_sierra_2026-03-03/submission.json">gpt-realtime-1.5</a><span class="comparison-meta">OpenAI · 2026-03-03</span></th><td data-domain="retail" data-score="44.7">44.70%</td><td data-domain="airline" data-score="40">40.00%</td><td data-domain="telecom" data-score="21.1">21.10%</td><td class="comparison-mean" data-mean="35.26666666666667">35.27%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="livekit-cascaded_livekit_2026-05-19" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/livekit-cascaded_livekit_2026-05-19/submission.json">Cascaded baseline</a><span class="comparison-meta">Multiple providers · 2026-05-19</span></th><td data-domain="retail" data-score="28.947368421052634">28.95%</td><td data-domain="airline" data-score="48">48.00%</td><td data-domain="telecom" data-score="16.666666666666664">16.67%</td><td class="comparison-mean" data-mean="31.204678362573095">31.20%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="gpt-realtime-1-0_openai_2026-04-13" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-realtime-1-0_openai_2026-04-13/submission.json">gpt-realtime-1.0</a><span class="comparison-meta">OpenAI · 2026-04-13</span></th><td data-domain="retail" data-score="35.96491228070175">35.96%</td><td data-domain="airline" data-score="36">36.00%</td><td data-domain="telecom" data-score="19.298245614035086">19.30%</td><td class="comparison-mean" data-mean="30.421052631578945">30.42%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="gemini-3-1-flash-live-preview-thinking-minimal_google_2026-04-13" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gemini-3-1-flash-live-preview-thinking-minimal_google_2026-04-13/submission.json">gemini-3.1-flash-live-preview-thinking-minimal</a><span class="comparison-meta">Google · 2026-04-13</span></th><td data-domain="retail" data-score="26.31578947368421">26.32%</td><td data-domain="airline" data-score="42">42.00%</td><td data-domain="telecom" data-score="17.543859649122805">17.54%</td><td class="comparison-mean" data-mean="28.619883040935672">28.62%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="gemini-live-2.5-flash_sierra_2026-03-03" data-result-group="standard"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gemini-live-2.5-flash_sierra_2026-03-03/submission.json">gemini-live-2.5-flash-native-audio</a><span class="comparison-meta">Google · 2026-03-03</span></th><td data-domain="retail" data-score="29.8">29.80%</td><td data-domain="airline" data-score="30">30.00%</td><td data-domain="telecom" data-score="17.5">17.50%</td><td class="comparison-mean" data-mean="25.766666666666666">25.77%</td><td class="comparison-status">Published</td></tr></tbody></table></div>
+<div class="comparison-heading"><h4>Custom · GPT-5.5 (xhigh) customer simulator</h4><span>6 results</span></div>
+<div class="comparison-table-wrap" role="region" aria-label="custom-gpt55" tabindex="0"><table class="comparison-table"><thead><tr><th scope="col">System</th><th scope="col">Retail</th><th scope="col">Airline</th><th scope="col">Telecom</th><th scope="col">Mean</th><th scope="col">Result status</th></tr></thead><tbody><tr class="comparison-ours" data-submission="ai-rudder-custom-va20260926a" data-result-group="custom-gpt55"><th scope="row"><strong>AI Rudder Voice Agent (CALL-E Backend)</strong><span class="comparison-meta">AI Rudder · 2026-09-26</span></th><td data-domain="retail" data-score="85.96491228070175">85.96%</td><td data-domain="airline" data-score="84">84.00%</td><td data-domain="telecom" data-score="96.49122807017544">96.49%</td><td class="comparison-mean" data-mean="88.8187134502924">88.82%</td><td class="comparison-status">Self-evaluated</td></tr>
+<tr data-submission="gpt-live-1-diamond-alpha-user-sim-gpt-5-5_openai_2026-09-09" data-result-group="custom-gpt55"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-live-1-diamond-alpha-user-sim-gpt-5-5_openai_2026-09-09/submission.json">gpt-live-1</a><span class="comparison-meta">OpenAI · 2026-09-09 · GPT-6 Astra (medium)</span></th><td data-domain="retail" data-score="84.21052631578947">84.21%</td><td data-domain="airline" data-score="78">78.00%</td><td data-domain="telecom" data-score="96.49122807017544">96.49%</td><td class="comparison-mean" data-mean="86.23391812865498">86.23%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="pine-voice-preview-user-sim-gpt-5-5_pineai_2026-08-17" data-result-group="custom-gpt55"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/pine-voice-preview-user-sim-gpt-5-5_pineai_2026-08-17/submission.json">Pine Voice Preview</a><span class="comparison-meta">Pine AI · 2026-08-17</span></th><td data-domain="retail" data-score="85.08771929824562">85.09%</td><td data-domain="airline" data-score="80">80.00%</td><td data-domain="telecom" data-score="75.43859649122807">75.44%</td><td class="comparison-mean" data-mean="80.17543859649123">80.18%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="grok-voice-3-0_xai_2026-10-14" data-result-group="custom-gpt55"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/grok-voice-3-0_xai_2026-10-14/submission.json">Grok Voice 3.0</a><span class="comparison-meta">xAI · 2026-10-14</span></th><td data-domain="retail" data-score="76.31578947368422">76.32%</td><td data-domain="airline" data-score="80">80.00%</td><td data-domain="telecom" data-score="82.45614035087719">82.46%</td><td class="comparison-mean" data-mean="79.5906432748538">79.59%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="grok-voice-think-fast-1-0-tool-mentor_pickle_2026-07-07" data-result-group="custom-gpt55"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/grok-voice-think-fast-1-0-tool-mentor_pickle_2026-07-07/submission.json">grok-voice-think-fast-1.0 + tool-mentor</a><span class="comparison-meta">Pickle · 2026-07-07</span></th><td data-domain="retail" data-score="76.31578947368422">76.32%</td><td data-domain="airline" data-score="70">70.00%</td><td data-domain="telecom" data-score="78.0701754385965">78.07%</td><td class="comparison-mean" data-mean="74.79532163742691">74.80%</td><td class="comparison-status">Published</td></tr>
+<tr data-submission="gpt-realtime-2_openai_2026-06-24" data-result-group="custom-gpt55"><th scope="row"><a href="https://github.com/sierra-research/tau2-bench/blob/0c69df456a96aa76a1162591574dad9c427a34d7/web/leaderboard/public/submissions/gpt-realtime-2_openai_2026-06-24/submission.json">gpt-realtime-2</a><span class="comparison-meta">OpenAI · 2026-06-29 · xhigh</span></th><td data-domain="retail" data-score="50">50.00%</td><td data-domain="airline" data-score="66">66.00%</td><td data-domain="telecom" data-score="37.719298245614034">37.72%</td><td class="comparison-mean" data-mean="51.239766081871345">51.24%</td><td class="comparison-status">Published</td></tr></tbody></table></div>
+</div>
+
+<p>Our self-evaluated scores are <strong>2.18 and 2.58 percentage points</strong> above the highest published scores in the corresponding groups. Scores can vary between runs, so a lead in one self-evaluation does not establish a stable ranking. Our results have not yet been officially verified. Voices, infrastructure, and error handling can differ across systems, so these margins cannot be attributed directly to the harness.</p>
+<aside class="reading-note">
+<strong>How to read these scores</strong>
+<p>Each task counts its first completed, valid attempt, not its best result. Incomplete or discarded attempts are handled under the evaluation protocol. In this batch, hallucination review discarded 11 Standard attempts and none in Custom. Custom had five automatic whole-task retries after infrastructure errors (one endpoint disconnect and four customer-side TTS failures); all five tasks passed on their retained attempt.</p>
+<p>The rules were developed and evaluated on public tasks, with no independent validation set and no full evaluation that changed only whether the entire harness was enabled. These scores describe the complete system; they neither isolate the harness’s contribution nor replace validation on real customer calls.</p>
+</aside>
+
+<p>Task completion also needs to be considered alongside response speed, stopping when interrupted, and talking over the customer. Interaction metrics were computed for this batch, but we do not report latency or cost figures here, or treat a higher pass rate as evidence of a better conversation. <a href="https://github.com/sierra-research/tau2-bench/blob/main/docs/interaction-metrics.md">Interaction metrics</a></p>
+</section><section id="section-5"><h2>5. Turn a fix into a method you can reuse</h2>
+<p>Start with one recurring failure you can reconstruct in your own agent. Find out why it happens and where the system has enough information to prevent it. These four steps turn that investigation into a change you can evaluate.</p>
+<h3>Step 1: Find the first mismatch</h3>
+<p>Work backward from the wrong action, aligning four records from the same call on one timeline:</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Question it should answer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Customer audio, raw ASR output, and submitted text</td>
+<td>What did the customer say, and what did the model receive?</td>
+</tr>
+<tr>
+<td>Messages actually passed to the model</td>
+<td>Was the necessary information available when it decided?</td>
+</tr>
+<tr>
+<td>Tool requests, forwarding records, and results</td>
+<td>Was the action only proposed, or did it execute?</td>
+</tr>
+<tr>
+<td>Generated text, playback progress, and retained history</td>
+<td>What did the customer hear, and what will the model believe it said?</td>
+</tr>
+</tbody></table></div>
+<p>Leave this step with a specific finding: “The confirmation never reached the model,” or “The tool returned, but the program did not record it.” If the model had all the necessary information and still chose incorrectly, revisit the prompt, business rules, or model itself. Runtime changes will not address every failure.</p>
+<h3>Step 2: Give the rule a precise scope</h3>
+<p>Write down <strong>which state justifies the decision, when the rule applies, and which action it changes</strong>. For example: “Within a turn, do not forward an identical write request that has already returned without an error.” Then define when that state is created and cleared, and what happens when the outcome is unknown. A normal return, an explicit failure, and an unconfirmed timeout need different treatment.</p>
+<p>Put the control where that information is available: the input buffer controls submission, the tool loop controls forwarding, and history management controls what the next model call receives. Workflow reminders can remain in the prompt. A hard block needs a sufficiently clear basis; if it still requires guessing the customer’s intent, consider clarification or a warning first.</p>
+<h3>Step 3: Test when the rule should act—and when it should leave things alone</h3>
+<p>Replay the target failures, then test nearby normal cases for false blocks. A duplicate-write check should suppress an identical request that has already returned without an error, while allowing retries after an error and new requests with different arguments. Write those expectations before looking at the results. A rule firing is not enough to call the problem fixed.</p>
+<p>Replay tells you whether the control behaves as intended. It cannot tell you whether added waiting frustrates the customer or whether more tool lookups make a task easier to complete.</p>
+<h3>Step 4: Decide using complete calls</h3>
+<p>Keep other settings fixed and toggle only the rule under test. Compare the target error, task completion, and added waiting, follow-up questions, or false blocks. Decide in advance what would justify keeping the rule and what regression would make you stop. If the sample is too small or customer responses differ too much between groups, collecting more evidence is a valid outcome.</p>
+<p>For a rule you retain, log the evidence that triggered it, the action taken, and what happened afterward. Keep it independently switchable. When another failure appears, you can then distinguish a model error from stale state or a poorly chosen rule.</p>
+<p><strong>A reusable change should answer three questions: which failure does it address, when should it stay out of the way, and what evidence supports keeping it?</strong> Establish that for one change before adding the next.</p></section></div></div></article>
+<footer><a class="brand" href="https://www.heycall-e.com/" aria-label="CALL-E home"><img class="brand-logo" src="/logo-call-e.svg?v=3" alt="CALL-E" width="134" height="44"></a><p><a href="https://docs.heycall-e.com/">Developer docs</a> · <a href="https://github.com/CALLE-AI">GitHub</a></p><span>© 2026 CALL-E</span><small class="site-version">v20261026-205729 · 2026-10-26 20:57:29 UTC+08:00</small></footer></main></body></html>

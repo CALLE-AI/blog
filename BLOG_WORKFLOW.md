@@ -1,3 +1,11 @@
+> Homepage update: article cards are generated from `content/posts.json`. Add new
+> articles there and run `python3 scripts/build_index.py`; do not edit the featured
+> article or card order directly in `docs/index.html`. Run
+> `python3 -m unittest discover -s tests` and
+> `python3 scripts/build_index.py --check` before committing. The latest date
+> becomes the featured article and all other articles appear below it in descending
+> publication order. See the English instructions in `README.md`.
+
 # CALL-E Blog 通用制作与维护流程
 
 这份文档用于以后新增、修改和发布 CALL-E 博客。当前站点是静态网站，代码仓库为 `CALLE-AI/blog`，GitHub Pages 从 `main` 分支的 `docs/` 目录发布，正式域名为 <https://blog.heycall-e.com/>。

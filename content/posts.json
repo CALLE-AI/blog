@@ -1,0 +1,80 @@
+[
+  {
+    "url": "/the-moment-to-yield/",
+    "category": "Engineering",
+    "date": "2026-09-24",
+    "title": "The Moment to Yield",
+    "description": "How voice agents use speech evidence to decide when to yield.",
+    "image": {
+      "src": "/yield-turnbench-cover.svg",
+      "alt": "TurnBench interruption chart comparing Recall and false-positive rate, with AI Rudder Helm Swift and Helm Bearing highlighted in blue.",
+      "width": "931",
+      "height": "701"
+    },
+    "chartCover": true
+  },
+  {
+    "url": "/beyond-the-model/",
+    "image": {
+      "src": "/beyond-the-model-cover.svg",
+      "alt": "τ-voice Standard and Custom scores, highlighting our self-evaluated results in blue.",
+      "width": "960",
+      "height": "640"
+    },
+    "category": "Engineering",
+    "date": "2026-10-26",
+    "title": "Beyond the Model: Building a Harness for a Voice Agent",
+    "description": "Start with a failed call, identify the missing state, add a control, and test whether it earns its place.",
+    "chartCover": true
+  },
+  {
+    "url": "/ai-can-make-calls-but-can-it-navigate-an-ivr-system/",
+    "image": {
+      "src": "/blog-navigate.png",
+      "alt": "Abstract yellow and charcoal artwork with the word Navigate."
+    },
+    "category": "Engineering",
+    "date": "2026-09-03",
+    "title": "AI Can Make Calls. But Can It Navigate an IVR System?",
+    "description": "How CALL-E learned when to listen, wait, press a key, and verify that a real phone system moved forward."
+  },
+  {
+    "url": "https://www.heycall-e.com/why-ai-phone-automation-was-impossible-five-years-ago/",
+    "target": "_blank",
+    "rel": "noreferrer",
+    "image": {
+      "src": "/blog-adaptive.png",
+      "alt": "Abstract blue and violet artwork with the word Adaptive."
+    },
+    "category": "Perspectives",
+    "date": "2026-05-28",
+    "title": "Why AI Phone Automation Was Impossible Five Years Ago",
+    "description": "Phone automation existed for decades. But only now can conversations adapt dynamically enough to handle real-world tasks naturally."
+  },
+  {
+    "url": "https://www.heycall-e.com/call-e-isnt-replacing-call-centers-its-creating-a-whole-new-market/",
+    "target": "_blank",
+    "rel": "noreferrer",
+    "image": {
+      "src": "/blog-new-market.png",
+      "alt": "Abstract orange and burgundy artwork with the words New Market."
+    },
+    "category": "Perspectives",
+    "date": "2026-05-28",
+    "title": "CALL-E Isn’t Replacing Call Centers. It’s Creating A Whole New Market.",
+    "description": "Traditional phone automation focuses on repetitive workflows. CALL-E unlocks millions of real-world calls nobody automated before."
+  },
+  {
+    "url": "https://www.heycall-e.com/your-ai-tools-can-write-poetry-but-they-still-cant-call-your-pharmacy/",
+    "target": "_blank",
+    "rel": "noreferrer",
+    "image": {
+      "src": "/blog-real-world.png",
+      "alt": "Abstract green, yellow, and blue artwork with the words Real World."
+    },
+    "category": "Product",
+    "date": "2026-05-28",
+    "title": "Your AI Tools Can Write Poetry. But They Still Can’t Call Your Pharmacy",
+    "description": "AI tools have become incredibly smart. But the real world still runs on phone calls. That’s the gap CALL-E was built to solve."
+  }
+]

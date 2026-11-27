@@ -39,9 +39,7 @@
     "description": "How CALL-E learned when to listen, wait, press a key, and verify that a real phone system moved forward."
   },
   {
-    "url": "https://www.heycall-e.com/why-ai-phone-automation-was-impossible-five-years-ago/",
-    "target": "_blank",
-    "rel": "noreferrer",
+    "url": "/why-ai-phone-automation-was-impossible-five-years-ago/",
     "image": {
       "src": "/blog-adaptive.png",
       "alt": "Abstract blue and violet artwork with the word Adaptive."
@@ -52,9 +50,7 @@
     "description": "Phone automation existed for decades. But only now can conversations adapt dynamically enough to handle real-world tasks naturally."
   },
   {
-    "url": "https://www.heycall-e.com/call-e-isnt-replacing-call-centers-its-creating-a-whole-new-market/",
-    "target": "_blank",
-    "rel": "noreferrer",
+    "url": "/call-e-isnt-replacing-call-centers-its-creating-a-whole-new-market/",
     "image": {
       "src": "/blog-new-market.png",
       "alt": "Abstract orange and burgundy artwork with the words New Market."
@@ -65,9 +61,7 @@
     "description": "Traditional phone automation focuses on repetitive workflows. CALL-E unlocks millions of real-world calls nobody automated before."
   },
   {
-    "url": "https://www.heycall-e.com/your-ai-tools-can-write-poetry-but-they-still-cant-call-your-pharmacy/",
-    "target": "_blank",
-    "rel": "noreferrer",
+    "url": "/your-ai-tools-can-write-poetry-but-they-still-cant-call-your-pharmacy/",
     "image": {
       "src": "/blog-real-world.png",
       "alt": "Abstract green, yellow, and blue artwork with the words Real World."
